@@ -1,0 +1,217 @@
+/* 德州扑克胜率计算器组件样式 */
+.poker-calc-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #f8f8f8;
+}
+
+/* 主要内容区域 */
+.content {
+  flex: 1;
+  padding: 20rpx;
+}
+
+/* 各个部分的通用样式 */
+.section {
+  background-color: white;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  color: #2c3e50;
+}
+
+/* 卡牌选择器 */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+  justify-content: center;
+}
+
+.card {
+  width: 120rpx;
+  height: 160rpx;
+  border-radius: 10rpx;
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28rpx;
+  border: 2rpx solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card.selected {
+  background-color: #e6f7ff;
+  border-color: #1890ff;
+  color: #1890ff;
+  font-weight: bold;
+}
+
+/* 玩家人数滑块 */
+.player-count {
+  padding: 0 20rpx;
+}
+
+/* 计算按钮 */
+.calculate-btn {
+  background-color: #2c3e50;
+  color: white;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  padding: 20rpx 0;
+  width: 100%;
+}
+
+.calculate-btn[disabled] {
+  background-color: #cccccc;
+  color: #999999;
+}
+
+/* 结果部分 */
+.result-section {
+  border-left: 6rpx solid #2c3e50;
+}
+
+.result-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.result-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.result-value {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.hand-strength {
+  margin-top: 20rpx;
+  padding: 16rpx;
+  background-color: #f9f9f9;
+  border-radius: 8rpx;
+}
+
+.hand-strength-label {
+  font-size: 28rpx;
+  color: #666;
+  margin-right: 10rpx;
+}
+
+.hand-strength-value {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+/* 卡牌选择器弹窗 */
+.card-picker-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.card-picker-content {
+  width: 90%;
+  max-height: 80%;
+  background-color: white;
+  border-radius: 12rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.close-btn {
+  font-size: 40rpx;
+  color: #999;
+  padding: 0 10rpx;
+}
+
+.card-picker-grid {
+  padding: 20rpx;
+  overflow-y: auto;
+}
+
+.suit-section {
+  margin-bottom: 30rpx;
+}
+
+.suit-label {
+  font-size: 36rpx;
+  margin-bottom: 10rpx;
+}
+
+.suit-label.red {
+  color: #e74c3c;
+}
+
+.suit-label.black {
+  color: #2c3e50;
+}
+
+.rank-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.picker-card {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 8rpx;
+  border: 1rpx solid #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28rpx;
+}
+
+.picker-card.red {
+  color: #e74c3c;
+}
+
+.picker-card.black {
+  color: #2c3e50;
+}
+
+.picker-card.disabled {
+  background-color: #f0f0f0;
+  color: #ccc;
+  pointer-events: none;
+}
