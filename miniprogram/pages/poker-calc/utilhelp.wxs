@@ -1,0 +1,33 @@
+/**
+ * 判断卡牌是否被选择过了
+ */
+function verifyIsCardSelected(selectedHandCards, selectedCommunityCards, card) {
+  // 检查手牌
+  for (var i = 0; i < selectedHandCards.length; i++) {
+    if (selectedHandCards[i] === card) {
+      return true;
+    }
+  }
+  // 检查公共牌
+  for (var i = 0; i < selectedCommunityCards.length; i++) {
+    if (selectedCommunityCards[i] === card) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * 判断是否为红色卡牌
+ */
+function isRedCard(selectedCommunityCards, i) {
+  if (i < 0 || i >= selectedCommunityCards.length) {
+    return false;
+  }
+  return selectedCommunityCards[i] && (selectedCommunityCards[i].indexOf('♥') >= 0 || selectedCommunityCards[i].indexOf('♦') >= 0);
+}
+
+module.exports = {
+  verifyIsCardSelected: verifyIsCardSelected,
+  isRedCard: isRedCard
+};

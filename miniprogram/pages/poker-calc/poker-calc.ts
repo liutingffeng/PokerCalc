@@ -2,7 +2,7 @@ import { isEmpty, cloneDeep } from '../../utils/lodash2';
 
 // 定义扑克牌花色和点数
 const SUITS = ['♠', '♥', '♣', '♦'];
-const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+const RANKS = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
 
 // 牌型定义
 const HAND_TYPES = {
@@ -110,6 +110,10 @@ Component({
       
       // 检查卡牌是否已被选择
       if (this.isCardSelected(card)) {
+        wx.showToast({
+          title: '该卡牌已被选择',
+          icon: 'none'
+        });
         return;
       }
       
@@ -130,28 +134,18 @@ Component({
       }
       
       this.updateCalculateButtonState();
-      
-      // 触发卡牌选择事件，通知父组件
-      this.triggerEvent('cardselect', {
-        handCards: this.data.selectedHandCards,
-        communityCards: this.data.selectedCommunityCards
-      });
     },
 
     // 检查卡牌是否已被选择
     isCardSelected(card: string): boolean {
-      return this.data.selectedHandCards.includes(card) || 
-             this.data.selectedCommunityCards.includes(card);
+      const res = this.data.selectedHandCards.includes(card) || 
+      this.data.selectedCommunityCards.includes(card);
+      return res;
     },
 
     // 更新玩家人数
     onPlayerCountChange(e: WechatMiniprogram.SliderChange) {
       this.setData({
-        playerCount: e.detail.value
-      });
-      
-      // 触发玩家数量变化事件
-      this.triggerEvent('playercountchange', {
         playerCount: e.detail.value
       });
     },
@@ -209,9 +203,6 @@ Component({
           hasResult: true,
           ...result
         });
-        
-        // 触发计算完成事件
-        this.triggerEvent('calculatecomplete', result);
         
         wx.hideLoading();
       }, 1500);
@@ -414,9 +405,37 @@ Component({
         handStrength: '',
         canCalculate: false
       });
-      
-      // 触发重置事件
-      this.triggerEvent('reset');
+    },
+
+    // 重置所有（包括玩家人数）
+    resetAll() {
+      // 显示确认对话框
+      wx.showModal({
+        title: '确认重置',
+        content: '确定要重置所有数据吗？',
+        success: (res) => {
+          if (res.confirm) {
+            this.setData({
+              selectedHandCards: ['', ''],
+              selectedCommunityCards: ['', '', '', '', ''],
+              playerCount: this.properties.initialPlayerCount,
+              hasResult: false,
+              winRate: 0,
+              tieRate: 0,
+              loseRate: 0,
+              handStrength: '',
+              canCalculate: false
+            });
+            
+            // 显示重置成功提示
+            wx.showToast({
+              title: '已重置',
+              icon: 'success',
+              duration: 1500
+            });
+          }
+        }
+      });
     },
 
     // 导出当前状态

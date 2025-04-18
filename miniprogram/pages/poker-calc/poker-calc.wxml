@@ -1,5 +1,11 @@
 <!-- 德州扑克胜率计算器组件 -->
-<navigation-bar title="德州扑克胜率计算" back="{{false}}" color="black" background="#FFF"></navigation-bar>
+<wxs module="utilhelp" src="utilhelp.wxs"></wxs>
+<navigation-bar
+  title="德州扑克胜率计算"
+  back="{{true}}"
+  color="black"
+  background="#FFF"
+></navigation-bar>
 <view class="poker-calc-container">
   <!-- 主要内容区域 -->
   <view class="content">
@@ -8,10 +14,20 @@
       <view class="section-title">你的手牌</view>
       <view class="card-selector">
         <view class="card-grid">
-          <view class="card {{selectedHandCards[0] ? 'selected' : ''}}" bindtap="showCardPicker" data-position="hand" data-index="0">
+          <view
+            class="card {{selectedHandCards[0] ? 'selected' : ''}}"
+            bindtap="showCardPicker"
+            data-position="hand"
+            data-index="0"
+          >
             {{selectedHandCards[0] ? selectedHandCards[0] : '选择'}}
           </view>
-          <view class="card {{selectedHandCards[1] ? 'selected' : ''}}" bindtap="showCardPicker" data-position="hand" data-index="1">
+          <view
+            class="card {{selectedHandCards[1] ? 'selected' : ''}}"
+            bindtap="showCardPicker"
+            data-position="hand"
+            data-index="1"
+          >
             {{selectedHandCards[1] ? selectedHandCards[1] : '选择'}}
           </view>
         </view>
@@ -23,19 +39,44 @@
       <view class="section-title">公共牌</view>
       <view class="card-selector">
         <view class="card-grid">
-          <view class="card {{selectedCommunityCards[0] ? 'selected' : ''}}" bindtap="showCardPicker" data-position="community" data-index="0">
+          <view
+            class="card {{selectedCommunityCards[0] ? 'selected' : ''}} {{utilhelp.isRedCard(selectedCommunityCards, 0) ? 'red' : ''}}"
+            bindtap="showCardPicker"
+            data-position="community"
+            data-index="0"
+          >
             {{selectedCommunityCards[0] ? selectedCommunityCards[0] : '选择'}}
           </view>
-          <view class="card {{selectedCommunityCards[1] ? 'selected' : ''}}" bindtap="showCardPicker" data-position="community" data-index="1">
+          <view
+            class="card {{selectedCommunityCards[1] ? 'selected' : ''}} {{utilhelp.isRedCard(selectedCommunityCards, 1) ? 'red' : ''}}"
+            bindtap="showCardPicker"
+            data-position="community"
+            data-index="1"
+          >
             {{selectedCommunityCards[1] ? selectedCommunityCards[1] : '选择'}}
           </view>
-          <view class="card {{selectedCommunityCards[2] ? 'selected' : ''}}" bindtap="showCardPicker" data-position="community" data-index="2">
+          <view
+            class="card {{selectedCommunityCards[2] ? 'selected' : ''}} {{utilhelp.isRedCard(selectedCommunityCards, 2) ? 'red' : ''}}"
+            bindtap="showCardPicker"
+            data-position="community"
+            data-index="2"
+          >
             {{selectedCommunityCards[2] ? selectedCommunityCards[2] : '选择'}}
           </view>
-          <view class="card {{selectedCommunityCards[3] ? 'selected' : ''}}" bindtap="showCardPicker" data-position="community" data-index="3">
+          <view
+            class="card {{selectedCommunityCards[3] ? 'selected' : ''}} {{utilhelp.isRedCard(selectedCommunityCards, 3) ? 'red' : ''}}"
+            bindtap="showCardPicker"
+            data-position="community"
+            data-index="3"
+          >
             {{selectedCommunityCards[3] ? selectedCommunityCards[3] : '选择'}}
           </view>
-          <view class="card {{selectedCommunityCards[4] ? 'selected' : ''}}" bindtap="showCardPicker" data-position="community" data-index="4">
+          <view
+            class="card {{selectedCommunityCards[4] ? 'selected' : ''}} {{utilhelp.isRedCard(selectedCommunityCards, 4) ? 'red' : ''}}"
+            bindtap="showCardPicker"
+            data-position="community"
+            data-index="4"
+          >
             {{selectedCommunityCards[4] ? selectedCommunityCards[4] : '选择'}}
           </view>
         </view>
@@ -46,13 +87,28 @@
     <view class="section">
       <view class="section-title">玩家人数</view>
       <view class="player-count">
-        <slider min="2" max="9" value="{{playerCount}}" show-value bindchange="onPlayerCountChange" />
+        <slider
+          min="2"
+          max="9"
+          value="{{playerCount}}"
+          show-value
+          bindchange="onPlayerCountChange"
+        />
       </view>
     </view>
 
-    <!-- 计算按钮 -->
-    <view class="section">
-      <button class="calculate-btn" bindtap="calculateOdds" disabled="{{!canCalculate}}">计算胜率</button>
+    <!-- 按钮区域 -->
+    <view class="section button-section">
+      <view class="button-row">
+        <button
+          class="calculate-btn"
+          bindtap="calculateOdds"
+          disabled="{{!canCalculate}}"
+        >
+          计算胜率
+        </button>
+        <button class="reset-btn" bindtap="resetAll">重置</button>
+      </view>
     </view>
 
     <!-- 胜率分析结果 -->
@@ -87,16 +143,25 @@
         <view class="close-btn" bindtap="hideCardPicker">×</view>
       </view>
       <view class="card-picker-grid">
-        <view class="suit-section" wx:for="{{suits}}" wx:key="index" wx:for-item="suit">
-          <view class="suit-label {{suit === '♥' || suit === '♦' ? 'red' : 'black'}}">{{suit}}</view>
+        <view
+          class="suit-section"
+          wx:for="{{suits}}"
+          wx:key="index"
+          wx:for-item="suit"
+        >
+          <view
+            class="suit-label {{suit === '♥' || suit === '♦' ? 'red' : 'black'}}"
+            >{{suit}}</view
+          >
           <view class="rank-grid">
-            <view 
-              class="picker-card {{isCardSelected(rank + suit) ? 'disabled' : ''}} {{(suit === '♥' || suit === '♦') ? 'red' : 'black'}}" 
-              wx:for="{{ranks}}" 
-              wx:key="index" 
+            <view
+              class="picker-card {{utilhelp.verifyIsCardSelected(selectedHandCards, selectedCommunityCards, rank + suit) ? 'disabled' : ''}} {{(suit === '♥' || suit === '♦') ? 'red' : 'black'}}"
+              wx:for="{{ranks}}"
+              wx:key="index"
               wx:for-item="rank"
               bindtap="selectCard"
               data-card="{{rank + suit}}"
+              style="opacity: 1"
             >
               {{rank}}
             </view>

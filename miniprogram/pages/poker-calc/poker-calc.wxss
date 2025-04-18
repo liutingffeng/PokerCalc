@@ -4,12 +4,16 @@
   flex-direction: column;
   width: 100%;
   background-color: #f8f8f8;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* 主要内容区域 */
 .content {
   flex: 1;
   padding: 20rpx;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 各个部分的通用样式 */
@@ -54,6 +58,10 @@
   border-color: #1890ff;
   color: #1890ff;
   font-weight: bold;
+}
+
+.card.red {
+  color: #fc0335;
 }
 
 /* 玩家人数滑块 */
@@ -211,7 +219,6 @@
 }
 
 .picker-card.disabled {
-  background-color: #f0f0f0;
-  color: #ccc;
+  background-color: #FFE082;
   pointer-events: none;
 }
