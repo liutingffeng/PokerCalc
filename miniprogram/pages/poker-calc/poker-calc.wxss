@@ -1,19 +1,24 @@
 /* 德州扑克胜率计算器组件样式 */
+
+
+/* 添加滚动容器样式 */
+.scroll-container {
+  height: calc(100vh - 188rpx);
+  background-color: #f8f8f8;
+}
+
 .poker-calc-container {
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-height: 100%;
   background-color: #f8f8f8;
-  height: 100vh;
-  overflow: hidden;
 }
 
 /* 主要内容区域 */
 .content {
   flex: 1;
   padding: 20rpx;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* 各个部分的通用样式 */
