@@ -2,7 +2,7 @@ import { isEmpty, cloneDeep } from '../../utils/lodash2';
 
 // 定义扑克牌花色和点数
 const SUITS = ['♠', '♥', '♣', '♦'];
-const RANKS = ['A', 'K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2'];
+const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 
 // 牌型定义
 const HAND_TYPES = {
@@ -67,7 +67,8 @@ Component({
     winRate: 0,
     tieRate: 0,
     loseRate: 0,
-    handStrength: ''
+    handStrength: '',
+    nickName: ''
   },
 
   /**
@@ -107,7 +108,7 @@ Component({
     // 选择卡牌
     selectCard(e: WechatMiniprogram.TouchEvent) {
       const { card } = e.currentTarget.dataset;
-      
+
       // 检查卡牌是否已被选择
       if (this.isCardSelected(card)) {
         wx.showToast({
@@ -116,7 +117,7 @@ Component({
         });
         return;
       }
-      
+
       if (this.data.currentPickPosition === 'hand') {
         const newHandCards = [...this.data.selectedHandCards];
         newHandCards[this.data.currentPickIndex] = card;
@@ -132,14 +133,14 @@ Component({
           showCardPicker: false
         });
       }
-      
+
       this.updateCalculateButtonState();
     },
 
     // 检查卡牌是否已被选择
     isCardSelected(card: string): boolean {
-      const res = this.data.selectedHandCards.includes(card) || 
-      this.data.selectedCommunityCards.includes(card);
+      const res = this.data.selectedHandCards.includes(card) ||
+        this.data.selectedCommunityCards.includes(card);
       return res;
     },
 
@@ -153,9 +154,9 @@ Component({
     // 更新计算按钮状态
     updateCalculateButtonState() {
       // 至少需要两张手牌才能计算
-      const canCalculate = !isEmpty(this.data.selectedHandCards[0]) && 
-                           !isEmpty(this.data.selectedHandCards[1]);
-      
+      const canCalculate = !isEmpty(this.data.selectedHandCards[0]) &&
+        !isEmpty(this.data.selectedHandCards[1]);
+
       this.setData({ canCalculate });
     },
 
@@ -166,7 +167,7 @@ Component({
         ...this.data.selectedHandCards.filter(card => !isEmpty(card)),
         ...this.data.selectedCommunityCards.filter(card => !isEmpty(card))
       ];
-      
+
       // 检查是否有足够的手牌
       if (selectedCards.length < 2) {
         wx.showToast({
@@ -175,35 +176,35 @@ Component({
         });
         return;
       }
-      
+
       // 显示加载提示
       wx.showLoading({
         title: '计算中...',
         mask: true
       });
-      
+
       // 模拟计算过程（实际应用中应该使用更复杂的算法）
       setTimeout(() => {
         // 计算当前最佳牌型
         const handStrength = this.evaluateCurrentHand();
-        
+
         // 模拟计算结果
         const winRate = this.simulateWinRate();
         const tieRate = Math.min(5, Math.random() * 10);
         const loseRate = 100 - winRate - tieRate;
-        
+
         const result = {
           winRate: parseFloat(winRate.toFixed(2)),
           tieRate: parseFloat(tieRate.toFixed(2)),
           loseRate: parseFloat(loseRate.toFixed(2)),
           handStrength
         };
-        
+
         this.setData({
           hasResult: true,
           ...result
         });
-        
+
         wx.hideLoading();
       }, 1500);
     },
@@ -212,15 +213,15 @@ Component({
     evaluateCurrentHand(): string {
       const handCards = this.data.selectedHandCards.filter(card => !isEmpty(card));
       const communityCards = this.data.selectedCommunityCards.filter(card => !isEmpty(card));
-      
+
       // 如果只有手牌，返回预估强度
       if (communityCards.length === 0) {
         return this.evaluatePreFlopHand(handCards);
       }
-      
+
       // 组合所有可用的牌
       const allCards = [...handCards, ...communityCards];
-      
+
       // 评估牌型
       return this.evaluatePokerHand(allCards);
     },
@@ -228,60 +229,81 @@ Component({
     // 评估翻牌前手牌强度
     evaluatePreFlopHand(handCards: string[]): string {
       if (handCards.length !== 2) return '';
-      
+
       const card1 = handCards[0];
       const card2 = handCards[1];
-      
+
       const rank1 = card1.charAt(0);
       const rank2 = card2.charAt(0);
       const suit1 = card1.charAt(1);
       const suit2 = card2.charAt(1);
-      
+
       const isPair = rank1 === rank2;
       const isSuited = suit1 === suit2;
       const value1 = CARD_VALUES[rank1];
       const value2 = CARD_VALUES[rank2];
-      
+
       // 评估手牌强度
       if (isPair) {
         if (value1 >= 10) return '高对';
         if (value1 >= 7) return '中对';
         return '低对';
       }
-      
+
       if (value1 >= 12 && value2 >= 12) return '高牌组合';
-      
+
       if (isSuited) {
         if ((value1 >= 12 && value2 >= 10) || (value2 >= 12 && value1 >= 10)) return '高同花连接';
         if (Math.abs(value1 - value2) === 1 && value1 >= 9 && value2 >= 9) return '同花连接';
       }
-      
+
       if (Math.abs(value1 - value2) === 1 && value1 >= 9 && value2 >= 9) return '连接牌';
-      
+
       if (value1 >= 12 || value2 >= 12) return '高牌';
-      
+
       return '普通牌';
     },
 
     // 评估完整的扑克牌型
     evaluatePokerHand(cards: string[]): string {
       if (cards.length < 5) return '需要至少5张牌来评估牌型';
-      
+
       // 提取牌的花色和点数
       const suits = cards.map(card => card.charAt(1));
       const ranks = cards.map(card => card.charAt(0));
       const values = ranks.map(rank => CARD_VALUES[rank]);
-      
-      // 检查是否同花
-      const isFlush = suits.every(suit => suit === suits[0]);
-      
+
+      // 检查是否同花 - 修改这部分
+      const suitCounts: Record<string, number> = {};
+      suits.forEach(suit => {
+        suitCounts[suit] = (suitCounts[suit] || 0) + 1;
+      });
+      const maxSuitCount = Math.max(...Object.values(suitCounts));
+      const isFlush = maxSuitCount >= 5;
+
+      // 如果是同花，找出同花的牌的值
+      let flushValues: number[] = [];
+      if (isFlush) {
+        // 修改这部分代码，避免使用可选链操作符
+        const flushSuitEntry = Object.entries(suitCounts).find(([_, count]) => count >= 5);
+        const flushSuit = flushSuitEntry ? flushSuitEntry[0] : null;
+
+        if (flushSuit) {
+          flushValues = cards
+            .filter(card => card.charAt(1) === flushSuit)
+            .map(card => CARD_VALUES[card.charAt(0)])
+            .sort((a, b) => b - a)
+            .slice(0, 5); // 取最大的5张
+        }
+      }
+
       // 检查是否顺子
       const sortedValues = [...values].sort((a, b) => a - b);
       let isStraight = true;
-      
+
       // 特殊情况：A-5-4-3-2 顺子
-      if (sortedValues.includes(14) && sortedValues.includes(2) && sortedValues.includes(3) && 
-          sortedValues.includes(4) && sortedValues.includes(5) && !sortedValues.includes(6)) {
+      if (sortedValues.includes(14) && sortedValues.includes(2) && sortedValues.includes(3) &&
+        sortedValues.includes(4) && sortedValues.includes(5) && !sortedValues.includes(6)) {
         isStraight = true;
       } else {
         // 常规顺子检查
@@ -292,29 +314,33 @@ Component({
           }
         }
       }
-      
+
       // 计算每个点数的出现次数
       const rankCounts: Record<string, number> = {};
       ranks.forEach(rank => {
         rankCounts[rank] = (rankCounts[rank] || 0) + 1;
       });
-      
+
       const counts = Object.values(rankCounts);
       const hasFour = counts.includes(4);
       const hasThree = counts.includes(3);
       const pairCount = counts.filter(count => count === 2).length;
-      
-      // 判断牌型
+
+      // 判断牌型时，对于同花顺的判断也需要修改
       if (isFlush && isStraight) {
+        // 需要确保同花的牌构成顺子
+        const isFlushStraight = flushValues.length >= 5 && this.checkStraight(flushValues);
+        if (!isFlushStraight) {
+          return HAND_TYPES.FLUSH; // 如果同花的牌不构成顺子，就只是普通同花
+        }
+
         // 检查是否皇家同花顺
-        if (sortedValues.includes(10) && sortedValues.includes(11) && 
-            sortedValues.includes(12) && sortedValues.includes(13) && 
-            sortedValues.includes(14)) {
+        if (flushValues.slice(0, 5).join(',') === '14,13,12,11,10') {
           return HAND_TYPES.ROYAL_FLUSH;
         }
         return HAND_TYPES.STRAIGHT_FLUSH;
       }
-      
+
       if (hasFour) return HAND_TYPES.FOUR_OF_A_KIND;
       if (hasThree && pairCount > 0) return HAND_TYPES.FULL_HOUSE;
       if (isFlush) return HAND_TYPES.FLUSH;
@@ -322,8 +348,33 @@ Component({
       if (hasThree) return HAND_TYPES.THREE_OF_A_KIND;
       if (pairCount >= 2) return HAND_TYPES.TWO_PAIR;
       if (pairCount === 1) return HAND_TYPES.ONE_PAIR;
-      
+
       return HAND_TYPES.HIGH_CARD;
+    },
+
+    // 新增一个辅助方法来检查是否构成顺子
+    checkStraight(values: number[]): boolean {
+      // 处理特殊情况：A-5顺子
+      if (values.includes(14)) {
+        const lowAceStraight = [5, 4, 3, 2, 1];
+        if (lowAceStraight.every(v => values.includes(v))) {
+          return true;
+        }
+      }
+
+      // 检查常规顺子
+      for (let i = 0; i < values.length - 4; i++) {
+        let isStraight = true;
+        for (let j = 0; j < 4; j++) {
+          if (values[i + j] !== values[i + j + 1] + 1) {
+            isStraight = false;
+            break;
+          }
+        }
+        if (isStraight) return true;
+      }
+
+      return false;
     },
 
     // 模拟胜率计算
@@ -331,22 +382,22 @@ Component({
       const handCards = this.data.selectedHandCards.filter(card => !isEmpty(card));
       const communityCards = this.data.selectedCommunityCards.filter(card => !isEmpty(card));
       const playerCount = this.data.playerCount;
-      
+
       // 基于手牌和公共牌的数量调整基础胜率
       let baseWinRate = 100 / playerCount; // 平均胜率
-      
+
       // 手牌评估
       if (handCards.length === 2) {
         const rank1 = handCards[0].charAt(0);
         const rank2 = handCards[1].charAt(0);
         const suit1 = handCards[0].charAt(1);
         const suit2 = handCards[1].charAt(1);
-        
+
         const isPair = rank1 === rank2;
         const isSuited = suit1 === suit2;
         const value1 = CARD_VALUES[rank1];
         const value2 = CARD_VALUES[rank2];
-        
+
         // 调整基础胜率
         if (isPair) {
           // 对子的胜率调整
@@ -374,21 +425,21 @@ Component({
           baseWinRate *= 1.05; // 有高牌
         }
       }
-      
+
       // 根据已知的公共牌调整胜率
       if (communityCards.length > 0) {
         // 这里可以添加更复杂的逻辑来评估公共牌对胜率的影响
         // 简化版：根据当前牌型调整胜率
         const allCards = [...handCards, ...communityCards];
         const handType = this.evaluatePokerHand(allCards);
-        
+
         if (handType) {
           const handRank = HAND_RANKS[handType];
           // 根据牌型强度调整胜率
           baseWinRate = Math.min(95, baseWinRate * (1 + handRank * 0.2));
         }
       }
-      
+
       // 确保胜率在合理范围内
       return Math.min(95, Math.max(5, baseWinRate));
     },
@@ -426,7 +477,7 @@ Component({
               handStrength: '',
               canCalculate: false
             });
-            
+
             // 显示重置成功提示
             wx.showToast({
               title: '已重置',
